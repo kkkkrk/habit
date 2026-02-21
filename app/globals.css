@@ -4,4 +4,6 @@ body {
 
 .add-btn {
   background-color: rgb(255, 54, 51);
+  width: 100px;
+  height: 40px;
 }
