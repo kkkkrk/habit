@@ -1,136 +1,148 @@
 'use client';
 
+import { useRef, useEffect, useState } from 'react';
 import { eachDayOfInterval, subDays, format, startOfWeek, getDay } from 'date-fns';
-import { ko } from 'date-fns/locale';
 
-const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
-
-// 활동량에 따른 색상
-const getColor = (count) => {
-    if (count === 0) return '#ebedf0';
-    // if (count <= 1) return '#9be9a8';
-    // if (count <= 3) return '#40c463';
-    // if (count <= 5) return '#30a14e';
-    return '#216e39';
+const getHeatColor = (count, accent) => {
+    if (count === 0) return 'var(--border)';
+    const a = Math.min(count / 5, 1);
+    return a < 0.25 ? accent + '40' : a < 0.5 ? accent + '80' : a < 0.75 ? accent + 'BB' : accent;
 };
 
-export default function HabitHeatmap({ data }) {
-    const today = new Date();
-    // 1년 전 그 주의 일요일부터 시작
-    const startDate = startOfWeek(subDays(today, 364), { weekStartsOn: 0 });
+export default function HabitHeatmap({ data, compact = false, accentColor }) {
+    const color = accentColor || '#30d158';
+    const scrollRef = useRef(null);
+    const [tooltip, setTooltip] = useState(null); // { x, y, date, count }
 
-    // 시작일 ~ 오늘 날짜 배열
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+        }
+    }, []);
+
+    const today = new Date();
+    const startDate = startOfWeek(subDays(today, 364), { weekStartsOn: 0 });
     const dates = eachDayOfInterval({ start: startDate, end: today });
 
-    // 날짜 → count 맵
     const countMap = {};
-    (data || []).forEach(({ date, count }) => {
-        countMap[date] = count;
-    });
+    (data || []).forEach(({ date, count }) => { countMap[date] = count; });
 
-    // 주(week) 단위로 날짜를 분리
     const weeks = [];
-    let currentWeek = [];
-    dates.forEach((date) => {
-        const dayOfWeek = getDay(date); // 0=일 ~ 6=토
-        if (dayOfWeek === 0 && currentWeek.length > 0) {
-            weeks.push(currentWeek);
-            currentWeek = [];
-        }
-        currentWeek.push(date);
+    let cur = [];
+    dates.forEach(date => {
+        const d = getDay(date);
+        if (d === 0 && cur.length > 0) { weeks.push(cur); cur = []; }
+        cur.push(date);
     });
-    if (currentWeek.length > 0) weeks.push(currentWeek);
+    if (cur.length > 0) weeks.push(cur);
 
-    // 월 라벨 계산 (각 주의 첫 날이 월이 바뀌는 시점)
     const monthLabels = weeks.map((week, i) => {
-        const firstDay = week[0];
-        const label = format(firstDay, 'M월');
-        // 이전 주와 월이 다르면 라벨 표시
+        const label = format(week[0], 'M월');
         if (i === 0) return label;
-        const prevFirst = weeks[i - 1][0];
-        return format(prevFirst, 'M') !== format(firstDay, 'M') ? label : '';
+        return format(weeks[i - 1][0], 'M') !== format(week[0], 'M') ? label : '';
     });
+
+    const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+    const cell = compact ? 9 : 13;
+    const gap = compact ? 2 : 3;
+
+    const handleMouseEnter = (e, ds, cnt) => {
+        e.currentTarget.style.opacity = '0.75';
+        if (cnt <= 0) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        setTooltip({
+            x: rect.left + rect.width / 2,
+            y: rect.top - 8,
+            date: ds,
+            count: cnt,
+        });
+    };
+
+    const handleMouseLeave = (e) => {
+        e.currentTarget.style.opacity = '1';
+        setTooltip(null);
+    };
 
     return (
-        <div style={{
-            background: 'rgb(255, 92, 51)',
-            // color: 'black',
-            border: '1px solid #e1e4e8',
-            borderRadius: '12px',
-            padding: '20px',
-            display: 'inline-block',
-            overflowX: 'auto',
-            maxWidth: '100%',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-        }}>
-            <h2 style={{ margin: '0 0 16px 0', fontSize: '15px', fontWeight: 700, color: 'black' }}>
-                내 활동 기록
-            </h2>
-
-            <div style={{ display: 'flex', gap: '4px' }}>
-                {/* 요일 라벨 (왼쪽) */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '20px' }}>
-                    {DAYS.map((day, i) => (
-                        <div key={day} style={{
-                            height: '12px',
-                            fontSize: '10px',
-                            color: 'black',
-                            lineHeight: '12px',
-                            visibility: i % 2 === 1 ? 'visible' : 'hidden',  // 홀수 요일만 표시
-                        }}>
-                            {day}
-                        </div>
-                    ))}
+        <>
+            {/* 커스텀 툴팁 */}
+            {tooltip && (
+                <div style={{
+                    position: 'fixed',
+                    left: tooltip.x,
+                    top: tooltip.y,
+                    transform: 'translate(-50%, -100%)',
+                    zIndex: 9999,
+                    background: 'var(--surface-hover)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '8px',
+                    padding: '6px 10px',
+                    pointerEvents: 'none',
+                    whiteSpace: 'nowrap',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                }}>
+                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '2px' }}>{tooltip.date}</p>
+                    <p style={{ fontSize: '13px', fontWeight: 700, color: tooltip.count > 0 ? color : 'var(--text-tertiary)' }}>
+                        {tooltip.count > 0 ? `${tooltip.count}회 완료` : '기록 없음'}
+                    </p>
                 </div>
+            )}
 
-                {/* 그리드 본체 */}
-                <div>
-                    {/* 월 라벨 */}
-                    <div style={{ display: 'flex', gap: '2px', marginBottom: '4px' }}>
-                        {weeks.map((_, i) => (
-                            <div key={i} style={{ width: '12px', fontSize: '10px', color: 'black', whiteSpace: 'nowrap' }}>
-                                {monthLabels[i]}
+            <div ref={scrollRef} style={{ display: 'inline-block', overflowX: 'auto', maxWidth: '100%' }}>
+                {!compact && (
+                    <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-tertiary)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '12px' }}>
+                        전체 활동 기록
+                    </p>
+                )}
+                <div style={{ display: 'flex', gap: '6px' }}>
+                    {!compact && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: gap + 'px', marginTop: '18px' }}>
+                            {DAYS.map((d, i) => (
+                                <div key={d} style={{ height: cell + 'px', fontSize: '10px', color: 'var(--text-tertiary)', lineHeight: cell + 'px', visibility: i % 2 === 1 ? 'visible' : 'hidden' }}>
+                                    {d}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <div>
+                        {!compact && (
+                            <div style={{ display: 'flex', gap: gap + 'px', marginBottom: '4px' }}>
+                                {weeks.map((_, i) => (
+                                    <div key={i} style={{ width: cell + 'px', fontSize: '10px', color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>
+                                        {monthLabels[i]}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-
-                    {/* 주 단위 열(column) 렌더링 */}
-                    <div style={{ display: 'flex', gap: '2px' }}>
-                        {weeks.map((week, wIdx) => (
-                            <div key={wIdx} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                {/* 일요일(0)부터 토요일(6)까지 7칸 보장 */}
-                                {Array.from({ length: 7 }, (_, dayIdx) => {
-                                    const date = week.find(d => getDay(d) === dayIdx);
-                                    if (!date) {
-                                        // 해당 요일 날짜 없으면 빈 칸
+                        )}
+                        <div style={{ display: 'flex', gap: gap + 'px' }}>
+                            {weeks.map((week, wi) => (
+                                <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: gap + 'px' }}>
+                                    {Array.from({ length: 7 }, (_, di) => {
+                                        const date = week.find(d => getDay(d) === di);
+                                        if (!date) return <div key={di} style={{ width: cell + 'px', height: cell + 'px' }} />;
+                                        const ds = format(date, 'yyyy-MM-dd');
+                                        const cnt = countMap[ds] ?? 0;
                                         return (
-                                            <div key={dayIdx} style={{ width: '12px', height: '12px' }} />
+                                            <div
+                                                key={ds}
+                                                style={{
+                                                    width: cell + 'px', height: cell + 'px',
+                                                    borderRadius: '3px',
+                                                    backgroundColor: getHeatColor(cnt, color),
+                                                    transition: 'opacity 0.1s',
+                                                    cursor: 'default',
+                                                }}
+                                                onMouseEnter={e => handleMouseEnter(e, ds, cnt)}
+                                                onMouseLeave={handleMouseLeave}
+                                            />
                                         );
-                                    }
-                                    const dateStr = format(date, 'yyyy-MM-dd');
-                                    const count = countMap[dateStr] ?? 0;
-                                    return (
-                                        <div
-                                            key={dateStr}
-                                            title={`${dateStr}: ${count}회 완료`}
-                                            style={{
-                                                width: '12px',
-                                                height: '12px',
-                                                borderRadius: '2px',
-                                                backgroundColor: getColor(count),
-                                                cursor: 'pointer',
-                                                transition: 'opacity 0.1s',
-                                            }}
-                                            onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
-                                            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-                                        />
-                                    );
-                                })}
-                            </div>
-                        ))}
+                                    })}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }

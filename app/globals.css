@@ -1,9 +1,126 @@
-body {
-  background-color: rgb(255, 180, 51);
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.add-btn {
-  background-color: rgb(255, 54, 51);
-  width: 100px;
-  height: 40px;
+:root {
+  /* 다크모드 (기본) */
+  --bg: #0D0D0F;
+  --surface: #111113;
+  --surface-hover: #18181A;
+  --border: #1E1E22;
+  --text: #FFFFFF;
+  --text-secondary: #8E8E93;
+  --text-tertiary: #48484A;
+  --accent: #FF6B35;
+  --accent-light: #FF6B3522;
+  --red: #EF4444;
+  --red-light: #EF444422;
+  --radius: 20px;
+}
+
+[data-theme='light'] {
+  /* 라이트모드 */
+  --bg: #F8F9FA;
+  --surface: #FFFFFF;
+  --surface-hover: #F1F3F5;
+  --border: #E5E7EB;
+  --text: #111827;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --accent: #FF6B35;
+  --accent-light: #FF6B3522;
+  --red: #EF4444;
+  --red-light: #EF444415;
+  --radius: 20px;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* 반응형 모바일 처리를 위한 유틸리티 클래스 */
+.responsive-header {
+  padding: 0 48px;
+  height: 60px;
+}
+
+.responsive-main {
+  padding: 40px 48px;
+}
+
+.responsive-grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.responsive-stats-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.responsive-stats-charts {
+  grid-template-columns: 1fr 1fr;
+}
+
+.responsive-login-box {
+  width: 360px;
+  padding: 40px 36px;
+  border-radius: 24px;
+  border: 1px solid #1E1E22;
+  background: #111113;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
+}
+
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .responsive-header {
+    padding: 0 20px;
+    height: 56px;
+  }
+
+  .responsive-main {
+    padding: 24px 20px;
+  }
+
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .responsive-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px !important;
+  }
+
+  .responsive-stats-charts {
+    grid-template-columns: 1fr;
+    gap: 20px !important;
+  }
+
+  .responsive-login-box {
+    width: 100%;
+    border: none;
+    border-radius: 0;
+    padding: 32px 24px;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block !important;
+  }
 }
