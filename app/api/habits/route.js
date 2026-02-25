@@ -25,13 +25,20 @@ export async function GET(request) {
 export async function POST(request) {
     try {
         await connectMongoose()
-        const { userId, name } = await request.json()
+        const { userId, name, frequency, targetCount, activeDays, startDay } = await request.json()
 
         if (!userId || !name || !name.trim()) {
             return NextResponse.json({ error: 'userId와 name이 필요합니다.' }, { status: 400 })
         }
 
-        const habit = await Habit.create({ userId, name: name.trim() })
+        const habit = await Habit.create({
+            userId,
+            name: name.trim(),
+            frequency: frequency || 'daily',
+            targetCount: targetCount || 1,
+            activeDays: activeDays || [0, 1, 2, 3, 4, 5, 6],
+            startDay: startDay ?? 1,
+        })
         return NextResponse.json(habit)
     } catch (error) {
         console.error(error)
