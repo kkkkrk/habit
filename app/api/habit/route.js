@@ -8,9 +8,10 @@ export async function POST(request) {
 
         const { userId, habitName } = await request.json()
 
-        // 오늘 날짜 (시간 제거 — 자정 기준)
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
+        // 오늘 날짜 — KST(UTC+9) 기준 자정
+        const now = new Date()
+        const kstOffset = 9 * 60 * 60 * 1000
+        const today = new Date(Math.floor((now.getTime() + kstOffset) / 86400000) * 86400000 - kstOffset)
 
         // 오늘 이미 기록이 있으면 count +1, 없으면 새로 생성
         const existing = await HabitLog.findOne({ userId, habitName, date: today })

@@ -28,7 +28,7 @@ export async function GET(request) {
             },
             {
                 $group: {
-                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+                    _id: { $dateToString: { format: '%Y-%m-%d', date: '$date', timezone: '+09:00' } },
                     count: { $sum: '$count' }
                 }
             }

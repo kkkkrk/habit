@@ -14,8 +14,10 @@ export async function GET(request) {
             return NextResponse.json({ error: 'userId가 필요합니다.' }, { status: 400 })
         }
 
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
+        // KST(UTC+9) 기준 오늘 자정
+        const now = new Date()
+        const kstOffset = 9 * 60 * 60 * 1000
+        const today = new Date(Math.floor((now.getTime() + kstOffset) / 86400000) * 86400000 - kstOffset)
 
         const logs = await HabitLog.find({ userId, date: today })
 

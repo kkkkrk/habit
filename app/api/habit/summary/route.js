@@ -26,7 +26,7 @@ export async function GET(request) {
 
             const dateSet = new Set(logs.map(l => {
                 const d = new Date(l.date)
-                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+                return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
             }))
 
             const totalCount = logs.reduce((s, l) => s + l.count, 0)
@@ -56,12 +56,13 @@ export async function GET(request) {
             }
 
             // currentStreak: 오늘 또는 어제가 마지막이어야 연속
-            const todayKST = new Date()
-            todayKST.setHours(0, 0, 0, 0)
-            const todayStr = `${todayKST.getFullYear()}-${String(todayKST.getMonth() + 1).padStart(2, '0')}-${String(todayKST.getDate()).padStart(2, '0')}`
+            const nowUtc = new Date()
+            const kstOffset = 9 * 60 * 60 * 1000
+            const todayKST = new Date(Math.floor((nowUtc.getTime() + kstOffset) / 86400000) * 86400000 - kstOffset)
+            const todayStr = `${todayKST.getUTCFullYear()}-${String(todayKST.getUTCMonth() + 1).padStart(2, '0')}-${String(todayKST.getUTCDate()).padStart(2, '0')}`
             const yest = new Date(todayKST)
-            yest.setDate(yest.getDate() - 1)
-            const yesterdayStr = `${yest.getFullYear()}-${String(yest.getMonth() + 1).padStart(2, '0')}-${String(yest.getDate()).padStart(2, '0')}`
+            yest.setUTCDate(yest.getUTCDate() - 1)
+            const yesterdayStr = `${yest.getUTCFullYear()}-${String(yest.getUTCMonth() + 1).padStart(2, '0')}-${String(yest.getUTCDate()).padStart(2, '0')}`
 
             if (dateSet.has(todayStr) || dateSet.has(yesterdayStr)) {
                 // 뒤에서부터 연속 계산
@@ -70,8 +71,8 @@ export async function GET(request) {
                 // 오늘 없으면 어제부터 시작
                 if (!dateSet.has(todayStr)) cursor = yest
                 while (true) {
-                    const cs = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`
-                    if (dateSet.has(cs)) { streak++; cursor.setDate(cursor.getDate() - 1) }
+                    const cs = `${cursor.getUTCFullYear()}-${String(cursor.getUTCMonth() + 1).padStart(2, '0')}-${String(cursor.getUTCDate()).padStart(2, '0')}`
+                    if (dateSet.has(cs)) { streak++; cursor.setUTCDate(cursor.getUTCDate() - 1) }
                     else break
                 }
                 currentStreak = streak

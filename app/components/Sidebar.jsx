@@ -22,14 +22,8 @@ export default function Sidebar({ activeTab, onTabChange, todayLabel }) {
             {/* 로고 */}
             <div style={{ padding: '0 24px 32px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{
-                        width: '36px', height: '36px', borderRadius: '10px',
-                        background: 'linear-gradient(135deg, #FF6B35, #F59E0B)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '18px',
-                    }}>🔥</div>
                     <span style={{ fontSize: '18px', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.3px' }}>
-                        Streaks
+                        Habit Tracker
                     </span>
                 </div>
             </div>

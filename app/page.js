@@ -11,7 +11,7 @@ async function getHabitData(userId) {
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
   const stats = await HabitLog.aggregate([
     { $match: { userId, date: { $gte: oneYearAgo } } },
-    { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } }, count: { $sum: "$count" } } }
+    { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$date", timezone: "+09:00" } }, count: { $sum: "$count" } } }
   ])
   return stats.map(item => ({ date: item._id, count: item.count }))
 }

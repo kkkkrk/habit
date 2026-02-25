@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Streaks · 습관 트래커",
-  description: "매일 습관을 기록하고 스트릭을 유지하세요",
+  title: "Habit Tracker",
+  description: "매일 습관을 기록하고 유지하세요",
 };
 
 export default function RootLayout({ children }) {

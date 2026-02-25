@@ -75,14 +75,8 @@ export default function LoginPage() {
             }}>
                 {/* 로고 */}
                 <div style={{ textAlign: 'center' }}>
-                    <div style={{
-                        width: '52px', height: '52px', borderRadius: '15px',
-                        background: 'linear-gradient(135deg, #FF6B35, #F59E0B)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '26px', margin: '0 auto 14px',
-                    }}>🔥</div>
                     <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.4px', marginBottom: '4px' }}>
-                        Streaks
+                        Habit Tracker
                     </h1>
                     <p style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>작은 습관이 큰 변화를 만듭니다</p>
                 </div>

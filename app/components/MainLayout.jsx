@@ -29,14 +29,9 @@ export default function MainLayout({ allHabitData, todayLabel, userId, userName,
             }}>
                 {/* 로고 */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{
-                        width: '32px', height: '32px', borderRadius: '9px',
-                        background: 'linear-gradient(135deg, #FF6B35, #F59E0B)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '16px',
-                    }}>🔥</div>
+
                     <span style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.3px' }}>
-                        Streaks
+                        Habit Tracker
                     </span>
                 </div>
 
@@ -153,9 +148,6 @@ export default function MainLayout({ allHabitData, todayLabel, userId, userName,
                 {activeTab === 'dashboard' && (
                     <>
                         <div style={{ marginBottom: '36px' }}>
-                            <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '8px' }}>
-                                오늘도 화이팅 🔥
-                            </p>
                             <h1 style={{ fontSize: '36px', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.5px' }}>
                                 내 습관
                             </h1>
@@ -167,9 +159,6 @@ export default function MainLayout({ allHabitData, todayLabel, userId, userName,
                 {activeTab === 'stats' && (
                     <>
                         <div style={{ marginBottom: '36px' }}>
-                            <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '8px' }}>
-                                나의 기록 📊
-                            </p>
                             <h1 style={{ fontSize: '36px', fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.5px' }}>
                                 전체 통계
                             </h1>
