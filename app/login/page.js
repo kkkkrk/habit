@@ -19,8 +19,7 @@ export default function LoginPage() {
     const [passwordConfirm, setPasswordConfirm] = useState('')
     const [displayName, setDisplayName] = useState('')
     const [email, setEmail] = useState('')
-    const [phone, setPhone] = useState('')
-    const [smsConsent, setSmsConsent] = useState(false)
+    const [emailConsent, setEmailConsent] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
@@ -51,13 +50,13 @@ export default function LoginPage() {
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: username.trim(), password, displayName: displayName.trim(), email: email.trim(), phone: phone.trim(), smsConsent }),
+                body: JSON.stringify({ username: username.trim(), password, displayName: displayName.trim(), email: email.trim(), emailConsent }),
             })
             const data = await res.json()
             if (!res.ok) { setError(data.error); return }
             setSuccess('가입 완료! 로그인해주세요.')
             setTab('login')
-            setDisplayName(''); setEmail(''); setPhone(''); setSmsConsent(false); setPasswordConfirm('')
+            setDisplayName(''); setEmail(''); setEmailConsent(false); setPasswordConfirm('')
         } catch {
             setError('네트워크 오류가 발생했습니다.')
         } finally {
@@ -188,24 +187,15 @@ export default function LoginPage() {
                             {passwordConfirm && password !== passwordConfirm && (
                                 <p style={{ fontSize: '12px', color: 'var(--red)', marginTop: '-4px' }}>비밀번호가 일치하지 않습니다.</p>
                             )}
-                            <input
-                                type="tel"
-                                placeholder="전화번호 (선택, 예: 010-1234-5678)"
-                                value={phone}
-                                onChange={e => setPhone(e.target.value)}
-                                style={inputStyle}
-                                onFocus={e => e.target.style.borderColor = 'var(--accent)'}
-                                onBlur={e => e.target.style.borderColor = 'var(--border)'}
-                            />
                             <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', userSelect: 'none' }}>
                                 <input
                                     type="checkbox"
-                                    checked={smsConsent}
-                                    onChange={e => setSmsConsent(e.target.checked)}
+                                    checked={emailConsent}
+                                    onChange={e => setEmailConsent(e.target.checked)}
                                     style={{ width: '16px', height: '16px', accentColor: '#FF6B35', cursor: 'pointer', flexShrink: 0 }}
                                 />
                                 <span style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                    SMS 수신에 동의합니다 <span style={{ color: 'var(--text-tertiary)' }}>(선택)</span>
+                                    이메일 수신에 동의합니다 <span style={{ color: 'var(--text-tertiary)' }}>(선택)</span>
                                 </span>
                             </label>
                         </>
