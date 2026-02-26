@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request) {
     try {
         await connectMongoose()
-        const { username, password, displayName, email, phone, smsConsent } = await request.json()
+        const { username, password, email, phone, smsConsent } = await request.json()
 
         if (!username?.trim() || !password) {
             return NextResponse.json({ error: '아이디와 비밀번호를 입력해주세요.' }, { status: 400 })
@@ -28,7 +28,7 @@ export async function POST(request) {
         const user = await User.create({
             username: username.trim(),
             password: hashed,
-            displayName: displayName?.trim() || username.trim(),
+
             email: email?.trim() || undefined,
             phone: phone?.trim() || undefined,
             smsConsent: !!smsConsent,

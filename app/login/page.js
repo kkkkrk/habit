@@ -17,9 +17,9 @@ export default function LoginPage() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [passwordConfirm, setPasswordConfirm] = useState('')
-    const [displayName, setDisplayName] = useState('')
+
     const [email, setEmail] = useState('')
-    const [emailConsent, setEmailConsent] = useState(false)
+
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
@@ -50,13 +50,13 @@ export default function LoginPage() {
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: username.trim(), password, displayName: displayName.trim(), email: email.trim(), emailConsent }),
+                body: JSON.stringify({ username: username.trim(), password, email: email.trim() }),
             })
             const data = await res.json()
             if (!res.ok) { setError(data.error); return }
             setSuccess('가입 완료! 로그인해주세요.')
             setTab('login')
-            setDisplayName(''); setEmail(''); setEmailConsent(false); setPasswordConfirm('')
+            setEmail(''); setPasswordConfirm('')
         } catch {
             setError('네트워크 오류가 발생했습니다.')
         } finally {
@@ -125,15 +125,7 @@ export default function LoginPage() {
 
                     {tab === 'register' && (
                         <>
-                            <input
-                                placeholder="닉네임 (선택)"
-                                value={displayName}
-                                onChange={e => setDisplayName(e.target.value)}
-                                maxLength={20}
-                                style={inputStyle}
-                                onFocus={e => e.target.style.borderColor = 'var(--accent)'}
-                                onBlur={e => e.target.style.borderColor = 'var(--border)'}
-                            />
+
                             <input
                                 type="email"
                                 placeholder="이메일 (선택)"
@@ -187,17 +179,6 @@ export default function LoginPage() {
                             {passwordConfirm && password !== passwordConfirm && (
                                 <p style={{ fontSize: '12px', color: 'var(--red)', marginTop: '-4px' }}>비밀번호가 일치하지 않습니다.</p>
                             )}
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', userSelect: 'none' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={emailConsent}
-                                    onChange={e => setEmailConsent(e.target.checked)}
-                                    style={{ width: '16px', height: '16px', accentColor: '#FF6B35', cursor: 'pointer', flexShrink: 0 }}
-                                />
-                                <span style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                    이메일 수신에 동의합니다 <span style={{ color: 'var(--text-tertiary)' }}>(선택)</span>
-                                </span>
-                            </label>
                         </>
                     )}
 
